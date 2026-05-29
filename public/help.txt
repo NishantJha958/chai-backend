@@ -1,0 +1,284 @@
+Javascript + MongoDB
+Database is always in another continent.
+The response sent as API is nothing but a return value.
+Express for routing and Mongoose for database.
+In backend either we are handling a data,file or third party API.
+file structure:
+-->src 
+.index(DB connects)
+.app(configurations,cookies,etc)
+.constants(enums,db name,api key)
+-->DB(actual code jo database se connect krta h)
+-->Models(schema,structure for data and models)
+-->Controllers(functions,all the functionalities)
+-->Routes(/login,/sign up work kre ,etc,these are routes)
+-->Middleware(function jo routes se phle chlti h)
+-->Utils(utilities)
+
+@ HOW TO DEPLOY BACKEND CODE IN PRODUCTION
+-->some code writing and deployment
+.browser sents request
+.server processes request(listens)[can listen on many routes like /:home route or /login: login setup ]
+.server sends response [and this listening and response is done by express js]
+.request are sent[for example get]
+.created an index.js. To run it or start it we will create a start in package.json file. SO we will run npm run start but the command will go as node index.js. This process is useful when working with servers.
+.Express is a web framework.
+.server wil listen on ports
+.app is a powerful thing acquiring express
+.we have to restart the server every time there is change in the code
+.once writing of the application is done we have to deploy and should be warned for some variables in production grade
+NOTES: [
+    index.js file:
+require('dotenv').config()
+const express = require('express')
+const app = express()
+const port = 3000
+
+app.get('/', (req, res) => {
+    res.send('hello world!')
+})//app sends 'get' request to home route(/),if there is any request we will response with the res.send()[a callback ]
+
+//handling more requests
+//syntax .get(route,handler) or .get(route,function(req,res)=>{}(via callback))
+app.get('/twitter', (req, res) => {
+    res.send('welcome to twitter')
+})
+
+app.get('/login', (req, res) => {
+    res.send('<h1>login page<h1>')
+})
+
+app.get('youtube', (req, res) => {
+    res.send('welcome to youtube')
+})
+
+//requests are done,now we will listen the requests
+
+app.listen(process.env.PORT, () => {
+    console.log(`example app listening on port ${port}`)
+})
+//so basically this is a server ,taking requests on / and /twitter and listening on port 3000
+]
+
+@HOW TO CONNECT FRONTEND TO BACKEND
+we will use axios for web requests like:
+//data kis tarah se aa rha h,kaise handle ho rha h,fail ho gya toh kya krna h loading hoga toh kya situation hogi,beech me data kop rok ke kuch add krna h uske ander
+//CORS is like it doesn't allow anyone to get the data from the server
+//if the origin is same then it allows otherwise it blocks,for that there are some solutions
+//1.go to backend,install cors dependecies/packages(like we used in backend)/npm install cors,and allow and adjust the origins
+//2.use proxy in backend/vite.config.js
+//we use build command to create dist where all the shrinked codes are wtitten which will go in the deployment,so it has to get that the proxy was used
+//in the server.js we will use a middleware to serve the static asset
+//adding proxies,proxy is an object,//jab bhi aap /api o / wale se pe request kren,apne aap append ho jaye localhost 3000,server ko lgega ki jo proxy aa rhi h isi url ki origin yhi se hui h
+//since this syntax is of module version we have to include "type":"module" in package.json
+// if not included the code will give error
+//use json formatter to format json data to make it readable
+//use proper comments and doc strings
+//now we wil have to consume this data at the frontend
+//to serve the static asset for the production , app.use() is used.
+//the frontend change wont propagate
+//there should be url standardization 
+//we cant always write this much big url,so we standardize and there comes the concept of proxies
+
+@DATA MODELLING FOR BACKEND WITH MONGOOSE
+1.Kya data hoga and kahan store hoga
+2.data modelling means design of the structure of the data stored or handled
+3.one the website is MOON MODELER or ERSAER.io,data modelling is like knowing taking/knowing the fields,types of data,how they interconnect
+4.keep in mind what are the fields or the data to be stored
+5.//we need to know mongoose model banata kaise h and export kaise krta h
+//import,build schema,export
+6.if the name given in the data modelling code is for example "User",in the database it will go as "users"
+7.const userSchema=new mongoose.Schema({}),this inside {},its an object for keeping the data,we will write fields inside it and the properties of it
+8.we can define like:
+{
+    username:string
+}
+this is valid,but there is an another way like:
+{
+    username:{
+        type:String,
+        required:true,
+        lowercase:true,
+        unique:true
+    }
+}
+9.for a field,custom validators or custom error messages can be sent like if there should be an min or max lenght,then a msg can be sent,in the form of an array, if the condition is not met
+like
+{
+    password:{
+        type:String,
+        required:[true,"username is required"]
+    }
+}
+10.one of the thing is timestamps,"createdAt","updatedAt",when we include this,mongoose will auto add these fields in our database
+11.how is it declared,just do pass it as secondary object of the schema like:
+{
+    password:{
+        type:String,
+        required:[true,"username is required"]
+    }
+},{timestamps:true}
+12.how to interconnect diff model as a major one,like for example,todos,subtodo and username
+for this: in the object/data declaration of the major one(here todo,we will connect sub and user to todos)
+like:
+{
+ createdBy:{
+    types:mongoose.Schema.Types.ObjectId,
+    ref:"User"//since User is the model name in user.js
+ },
+ subTodos:[
+    {
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"SubTodo",
+    },
+ ],
+}
+
+@E-COMMERCE AND HOSPITAL MANAGEMENT DATA MODELLING
+
+@PROFESSIONAL BACKEND PROJECT
+ 
+@SETUP OF A PROFESSIONAL BACKEND FOR A PROJECT
+
+@ HOW TO CONNECT DATABASE IN MERN WITH DEBUGGING
+1.DB should have a name, so export and keep it in the constants.js file.
+2.there are 2 approach for DB connection :a) of writing the connection code in the index.js file and when the site loads, it get directly from index.js  b)have a DB folder containing connection code,then importing it in index.js
+3.DB se jab bhi baat krenge toh problem aa skti h,so always wrap in try and catch or promises.
+4.DB se jb bhi contact krenge toh time lagta therefore async await lagana hi pdega.
+5.one approach is of direct connecting using function: import mongoose from mongoose function connectDB(){}  connectDB();
+but this can be made better using IIFE : ;(async()=>{})()
+second is of creating a file in db folder and exporting it.
+common things:1.in exporting constants.js instead of constants,2.check the .env mongodb uri,3.check the error and read it,reach to the file where the error is and debug it,4.path:./.env not /.env
+
+@CUSTOM API HANDLING AND ERROR HANDLING
+1.req.params is imp,mostly the data req is of this type
+2.app.use() when using middlewares or configurational settings
+import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+
+const app = express();
+//configuration  
+app.use(cors({
+    origin: process.env.CORS_ORIGIN,
+    credentials: true
+}))
+
+app.use(express.json({ limit: "16kb" }))//when data comes from form
+
+app.use(express.urlencoded({ extended: true, limit: "16kb" }))//when data comes from url
+
+app.use(express.static("public"))//when we want to keep some files static to store the image and other files data
+
+//use of cookie parser is to access and edit cookies of the browser
+
+app.use(cookieParser())
+
+export { app }
+3.when clicked on url,the request is send after that a response is gen ,like res.json or res.send("NJ")
+(req,res)=>{} is the syntax .So between the url and response there is the middlewares which keeps check on what can send request further and get responses. Also 4 things comes: (err,req,res,next) ,where next is just a flag for the middleware
+4.in the DB connection the async code nd the try catch block,it will be used frequently coz we will be talking the db many time so we will wrap this code in a wrapper and keep it in the Utils folder.
+5.we will create the asynchandler.js in utils folder ,jiska kaam rhega ki ek method banaega aur export kar dega.
+
+6.graph LR
+    API[🌐 API Communication System]
+    
+    %% Branch 1: The Request flow
+    API --> Flow[📍 The Request Flow]
+    Flow --> Client[1. Frontend requests data]
+    Flow --> Router[2. Router maps URL to controller]
+    Flow --> AH_Wrap[3. asyncHandler wraps controller]
+    Flow --> Ctrl[4. Controller talks to Database]
+
+    %% Branch 2: Success path
+    API --> Success[💚 The Success Path]
+    Success --> ApiResponse[📦 ApiResponse.js]
+    ApiResponse --> S_Role[Role: The Standard Plate]
+    ApiResponse --> S_Desc[Ensures every successful response is formatted exactly the same]
+    ApiResponse --> S_Keys["Key variables: statusCode, message, data, success (true)"]
+
+    %% Branch 3: Failure path
+    API --> Failure[❤️ The Failure Path]
+    Failure --> ApiError[⚠️ apiErrors.js]
+    ApiError --> E_Role[Role: The Standard Complaint Card]
+    ApiError --> E_Desc[Adds web status codes to default JS errors so frontend understands what failed]
+    
+    Failure --> AsyncHandler[🛡️ asyncHandler.js]
+    AsyncHandler --> A_Role[Role: The Chef's Safety Net]
+    AsyncHandler --> A_Desc[Listens for database crashes and safely catches them]
+7.asyncHandler.js:It wraps your async functions. If your database crashes or query fails, it catches the error and sends it to Express's global handler, preventing the server from crashing.
+apiResponse.js:Creates a beautiful, standard JSON template for success (e.g. { statusCode, data, message, success: true }). Every single successful page load looks identical.
+apiErrors.js:
+Extends the basic JS Error class to attach HTTP Status Codes (like 400, 401, 404) and standard message formats so the frontend knows exactly why it failed.
+   Depending on the outcome, the server wraps the result in ApiResponse (for success) or ApiError (for failure) so the user gets a perfect, readable final message!
+
+@USER AND VIDEO MODEL USING HOOKS AND JWT
+1.build video and user model by data modelling
+2.will download mongoose -agg package for aggregation queries
+3.mongoose helps us to add our plugin(a hook),we will add the plugin line before export in video.model.js which will give us aggregation pipelines ,also the middlewares
+4.install bcrypt,its a library which helps to hash the password
+5.install jwt to encrypt data
+6.direct encryption not possible,so we will use some hooks of the mongoose
+Some hooks : Pre = jaise hi data save hone wala hoga,usse just Pehle koi code run krwa skta h
+syntax: userSchema.pre("functionality", callback()=>{}){},functionality like save,validate,etc
+how to use:(code)=//hooks
+userSchema.pre("save", async function (next) {
+    if (!this.isModified("password")) return next();
+    this.password = await bcrypt.hash(this.password, 10);
+    next();
+})
+//methods or custom methods
+userSchema.methods.isPasswordCorrect=async function(password){
+    return await bcrypt.compare(password,this.password)
+}
+what is does is that "pre" hook before saving ,encrypt the password using bcrypt library,since it takes some time it is a async function,next is the flag that it encrypted or not,encrypt by the function bcrypt.hash(object,rounds),rounds are the algorithm to encrypt the password
+Then to check if the DB password matches the password here using custom method
+7.JWT is a bearer token,coz jo isko bear  krta h (rkhta h) usko allow hota h,ye token jiske bhi paas h main usko data bhej dunga types.
+accessToken ko DB me save nhi krenge, refreshToken ko DB me save krenge
+
+@HOW TO UPLOAD FILE IN BACKEND
+multer the use krke file ko local server pe temporary daal denge
+cloudinary ka use krte hue local server se file leke server pe daal denge
+
+@HTTP CRASH COURSE
+HTTP:sends the data as it is
+HTTPS:sends the data with a layer of encryption
+URL-uniform resource locator
+URI-uniform resource identifier
+URN-uniform resource name
+we just need the address to talk to
+HTTP HEADERS:metadta----> key value ent along with req and res
+-->used for caching,authentication and manage statusCode
+*Request Heasders :data from Client
+*Request Headers :data from servers
+*Representation Headers :data in which encoding or compression
+*Paylod Headers: size or length of data(actually a  data which is sended)
+
+Most Common Headers: $ Accept        CORS:
+$ User                               Access-Control-Allow-Origin
+$ Authorization                      Access-Control-Allow-Credentials
+$ Content-Type                        Access-Control-Allow-Methods
+$ Cookie                             Access-Control-Allow-Headers
+$ Cache-control
+
+HTTPS METHODS:Basic set of ops that can be used to interact with server
+$ GET:retreive data from server
+$ POST:create or send data to server
+$ PUT:update entire data
+$ PATCH:update specific data
+$ DELETE:delete/remove data
+$ HEAD:fetches the headers only,not the body
+$ OPTIONS:ask server which methods are allowed
+$ TRACE:request /loopback test(get same data)
+
+HTTP STATUS CODE: 1xx for informational responses
+ 2xx for successfull responses
+ 3xx for redirection messages
+ 4xx for client side error
+ 5xx for server side error
+
+ @GUIDE FOR CONTROLLER AND ROUTER
+1.writing controller == logic building
+2.route== URL + HTTP method + function(controller)
+
+@LOGIC BUILDING : REGISTER CONTROLLER
