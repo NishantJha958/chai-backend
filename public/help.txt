@@ -286,4 +286,6 @@ HTTP STATUS CODE: 1xx for informational responses
 @ACCESS TOKENS AND REFRESH TOKENS:
 Access token are short lived while refresh token are long lived
 so now using AT and RT we will make the "login"
+//after the series learn API security and scaling,learn ZOD,learn Caching (redis),
+//learn jest,supertest and docker
 
