@@ -282,3 +282,8 @@ HTTP STATUS CODE: 1xx for informational responses
 2.route== URL + HTTP method + function(controller)
 
 @LOGIC BUILDING : REGISTER CONTROLLER
+@HOW TO USE POSTMAN
+@ACCESS TOKENS AND REFRESH TOKENS:
+Access token are short lived while refresh token are long lived
+so now using AT and RT we will make the "login"
+

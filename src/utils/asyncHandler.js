@@ -20,4 +20,4 @@ const asyncHandler = (requestHandler) => {
 //we should standardize the response and the error format
 
 
-export default asyncHandler
+export { asyncHandler }
