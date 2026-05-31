@@ -196,11 +196,120 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
         throw new ApiError(401, error?.message || "Invalid refresh token")
     }
 })
-//update controller
+//update controllers 
+//for changing the password
+const changeCurrentPassword = asyncHandler(async (req, res) => {
+    const { oldPassword, newPassword } = req.body;
+
+    if (!oldPassword || !newPassword) {
+        throw new ApiError(400, "Old password and new password are required");
+    }
+
+    const user = await User.findById(req.user?._id)
+    if (!user) {
+        throw new ApiError(404, "User not found")
+    }
+
+    const isPasswordValid = await user.isPasswordCorrect(oldPassword)
+    if (!isPasswordValid) {
+        throw new ApiError(401, "Invalid old password")
+    }
+
+    user.password = newPassword
+    await user.save({ validateBeforeSave: false })
+
+    return res.status(200).json(new ApiResponse(200, {}, "Password changed successfully"))
+})
+
+const updateAccountDetails = asyncHandler(async (req, res) => {
+    //The Destructuring: In your backend controller, you extract the values currently sent from the form
+    //Here, fullName automatically holds the new value ("John Smith"), and email holds the email (whether it was changed or remained the same).
+    const { fullName, email } = req.body
+    //The Edit: The user changes the name in the text box to John Smith and clicks Save.
+    //The Request: The frontend sends the form data in req.body containing the values
+    if (!fullName || !email) {
+        throw new ApiError(400, "All fields are required")
+    }
+
+    const user = await User.findByIdAndUpdate(
+        req.user?._id,
+        {
+            $set: {
+                fullname: fullName, // matches 'fullname' in userSchema
+                email: email
+            }
+        },
+        { new: true } // Returns the updated document
+    ).select("-password -refreshToken")
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, user, "Account details updated successfully"))
+})
+
+const getCurrentUser = asyncHandler(async (req, res) => {
+    return res
+        .status(200)
+        .json(new ApiResponse(200, req.user, "User fetched successfully"))
+})
+//updating files,first we need multer,second only those can update who are logged in
+const updateAvatar = asyncHandler(async (req, res) => {
+    const avatarLocalPath = req.file?.path//path is the local path on the server
+    if (!avatarLocalPath) {
+        throw new ApiError(400, "Avatar is required")
+    }
+    const avatar = await uploadOnCloudinary(avatarLocalPath)
+    if (!avatar.url) {
+        throw new ApiError(400, "avatar not uploaded")
+    }
+    //now update user's avatar
+    const user = await User.findByIdAndUpdate(
+        req.user?._id,
+        {
+            $set: {
+                avatar: avatar.url
+            }
+        }
+        , { new: true }
+    ).select("-password -refreshToken")
+    return res
+        .status(200)
+        .json(new ApiResponse(200, user, "avatar updated successfully"))
 
 
 
+})
+const updateUserCoverImage = asyncHandler(async (req, res) => {
+    const coverImageLocalPath = req.file?.path
+    if (!coverImageLocalPath) {
+        throw new ApiError(400, "cover Image is required")
+    }
+    const user = await User.findByIdAndUpdate(
+        req.user?._id,
+        {
+            $set: {
+                coverImage: coverImageLocalPath
+            }
+        }
+        , { new: true }
+    ).select("-password -refreshToken")
+    return res
+        .status(200)
+        .json(new ApiResponse(200, user, "cover Image updated successfully"))
 
-export { registerUser, loginUser, logoutUser, refreshAccessToken }
+})
+
+export {
+    registerUser,
+    loginUser,
+    logoutUser,
+    refreshAccessToken,
+    getCurrentUser,
+    changeCurrentPassword,
+    updateAccountDetails,
+    updateAvatar,
+    updateUserCoverImage
+}
 //method toh bana diya,but ye run kab hoga,jab koi na koi url hit ho
 //toh for that we will write the ROUTE
+
